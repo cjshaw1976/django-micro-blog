@@ -12,6 +12,7 @@ LIKE_CHOICES = (
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    email_confirmed = models.BooleanField(default=False)
     bio = models.TextField(max_length=500, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     avatar = models.ImageField('profile picture',
@@ -27,7 +28,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-    
+
 class Followers(models.Model):
     user = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
     follower = models.ForeignKey(User, on_delete=models.CASCADE)

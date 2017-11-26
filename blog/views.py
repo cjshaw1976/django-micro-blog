@@ -1,4 +1,6 @@
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from django.contrib.auth.models import User
 
@@ -28,6 +30,7 @@ def deletePost(request, pk):
 def newUser(request, step=0):
     # New user
     # https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html
+    # https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html#sign-up-with-confirmation-mail
     return render(request, 'home.html', {})
 
 def confirmUser(request, hashCode):
@@ -46,9 +49,26 @@ def postsUser(request):
     # List user posts
     return render(request, 'home.html', {})
 
-def loginUser(request, username=''):
+def loginUser(request):
     # Login User
-    return render(request, 'home.html', {})
+    return render(request, 'login.html', {})
+
+
+@csrf_protect
+def loginUserNameCheck(request):
+    # Test username is valid
+    username = request.POST.get('username', '')
+    data = {
+        'username': username,
+    }
+
+    if User.objects.filter(username=username).exists():
+        data['exists'] = True
+    else:
+        data['exists'] = False
+
+    return JsonResponse(data)
+
 
 def logoutUser(request):
     # Logout User

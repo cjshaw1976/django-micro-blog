@@ -15,7 +15,8 @@ urlpatterns = [
     url(r'^user/(?P<userName>\w+)/edit/$', views.editUser, name='user_edit'),
     url(r'^user/confirm/(?P<hashCode>\w+)/edit/$', views.confirmUser, name='user_confirm'),
 
-    url(r'^login(?:/(?P<username>\w+))?/$', views.loginUser, name='user_login'),
+    url(r'^login/$', views.loginUser, name='user_login'),
+    url(r'^login/usercheck/$', views.loginUserNameCheck, name='user_login_name_check'),
     url(r'^logout/$', views.logoutUser, name='user_logout'),
 
 ]
