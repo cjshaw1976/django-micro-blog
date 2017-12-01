@@ -11,7 +11,8 @@ LIKE_CHOICES = (
 )
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userProfile')
+    secret_word = models.CharField(max_length=32)
     email_confirmed = models.BooleanField(default=False)
     bio = models.TextField(max_length=500, blank=True)
     birth_date = models.DateField(null=True, blank=True)

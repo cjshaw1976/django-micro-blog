@@ -28,7 +28,7 @@
               {% url 'post' as home_path %}
               {% if user.is_authenticated %}
               <li{% if home_path == request.path %} class="active"{% endif %}><a href="{% url 'home' %}">My Feed{% if home_path == request.path %}<span class="sr-only"> (current)</span>{% endif %}</a></li>
-              <li{% if home_path == request.path %} class="active"{% endif %}><a href="{% url 'view_post' %}">Post{% if home_path == request.path %}<span class="sr-only"> (current)</span>{% endif %}</a></li>
+              <li{% if home_path == request.path %} class="active"{% endif %}><a href="{% url 'new_post' %}">Post{% if home_path == request.path %}<span class="sr-only"> (current)</span>{% endif %}</a></li>
               {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

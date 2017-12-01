@@ -1,5 +1,6 @@
+from django.contrib.auth import logout
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from django.contrib.auth.models import User
@@ -72,4 +73,5 @@ def loginUserNameCheck(request):
 
 def logoutUser(request):
     # Logout User
-    return render(request, 'home.html', {})
+    logout(request)
+    return redirect('home',)
