@@ -1,78 +1,150 @@
 {% extends "base.html" %}
 {% load static %}
-
-
 {% block content %}
-<h1>Login Page</h1>
-
 <div class="row vertical-center">
-    <div class="col-sm-6 col-sm-offset-3">
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <h3 class="panel-title">Sign In</h3>
-        </div>
-        <div class="panel-body">
-          <div class="col-xs-8 col-xs-offset-2">
-            <div id="errorText" class="text-center alert "></div>
-            <form id="frmUserName">
-              {% csrf_token %}
-              <div id="userNameInput" class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon transparent"><span class="glyphicon glyphicon-user"></span></span>
-                    <input id="username" class="form-control left-border-none" placeholder="User Name" type="text" name="username" autocomplete="off">
-                </div>
-              </div>
-              <div id="memorableInput" class="form-group hide">
-                <div class="input-group">
-                  <p class="text-center">x, y and y letters of your memorable word</p>
-                  <div class="col-xs-4">
-                    <input id="memOne" class="form-control onecharonly" type="text" name="memOne" autocomplete="off">
-                  </div>
-                  <div class="col-xs-4">
-                    <input id="memTwo" class="form-control onecharonly" type="text" name="memTwo" autocomplete="off">
-                  </div>
-                  <div class="col-xs-4">
-                    <input id="memThr" class="form-control onecharonly" type="text" name="memThr" autocomplete="off">
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <button id="btnContinue" class="btn btn-large btn-block btn-success" type="submit">Continue</button>
-              </div>
-            </form>
-            <hr>
-            <p class="text-center">New User?</p>
-            <a href="{% url 'user_new' %}" class="btn btn-large btn-default btn-block">Sign Up</a>
+  <div class="col-sm-6 col-sm-offset-3">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">Sign In</h3>
+      </div>
+      <div class="panel-body">
+        <div id="errorText" class="text-center alert"></div>
+        <form id="frmUserLogin">
+          {% csrf_token %}
+          <div id="userNameInput" class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon transparent"><span class="glyphicon glyphicon-user"></span></span>
+              <input id="username" class="form-control left-border-none" placeholder="User Name" type="text" name="username" autocomplete="off">
+            </div>
           </div>
+          <div id="memorableInput" class="hidden">
+            <p id="memorableInstructions" class="text-center"></p>
+            <div class="form-group col-xs-10 col-xs-offset-1">
+              <div class="col-xs-4">
+                <input id="memOne" class="form-control onecharonly" type="text" name="memone" autocomplete="off">
+              </div>
+              <div class="col-xs-4">
+                <input id="memTwo" class="form-control onecharonly" type="text" name="memtwo" autocomplete="off">
+              </div>
+              <div class="col-xs-4">
+                <input id="memThr" class="form-control onecharonly" type="text" name="memthr" autocomplete="off">
+              </div>
+            </div>
+          </div>
+          <div id="passwordInput" class="form-group hidden">
+            <div class="input-group">
+              <span class="input-group-addon transparent"><span class="glyphicon glyphicon-lock"></span></span>
+              <input id="password" type="password" class="form-control left-border-none" placeholder="Password" type="text" name="password" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-group">
+            <button id="btnContinue" class="btn btn-large btn-block btn-success" type="submit">Continue</button>
+          </div>
+        </form>
+        <hr>
+        <div id="newUser">
+          <p class="text-center">New User?</p>
+          <a href="{% url 'user_new' %}" class="btn btn-large btn-default btn-block">Sign Up</a>
+        </div>
+        <div id="resetPassword" class="hidden">
+          <p class="text-center">Forgotton your password?</p>
+          <a href="{% url 'user_new' %}" class="btn btn-large btn-default btn-block">Reset password</a>
         </div>
       </div>
     </div>
+  </div>
 </div>
 
 <script type="text/javascript">
   document.addEventListener("DOMContentLoaded", function(event) {
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-    $("#frmUserName").on('submit', function(e){
+    // Set the focus on the username input initally
+    $('#username').focus();
+
+
+    $("#frmUserLogin").on('submit', function(e){
       e.preventDefault();
-      if ($('#username').val()){
-        var formData = $('#frmUserName').serializeArray();
-        $('#errorText').text('.');
-        $('#errorText').removeClass('alert-danger');
 
-        $.post('{% url 'user_login_name_check' %}' ,formData, function(data, status){
-          if (data.exists == false){
-            $('#errorText').text('User does not exist.');
-            $('#errorText').addClass('alert-danger');
-          } else {
-            $('#userNameInput').hide();
-            $('#memorableInput').show();
-          }
 
-        });
-      } else {
-        $('#errorText').text('Enter a user name.');
-        $('#errorText').addClass('alert-danger');
+      if (!$('#userNameInput').hasClass("hidden")) {
+        // Username Input
+        if ($('#username').val()){
+          $('#errorText').text('');
+          $('#errorText').removeClass('alert-danger');
+
+          $.post('{% url 'user_login_check' %}', { csrfmiddlewaretoken: csrftoken, username: $('#username').val() }, function(data, status){
+            if (data.exists == false) {
+              $('#errorText').text('User does not exist.');
+              $('#errorText').addClass('alert-danger');
+              $('#userNameInput').select();
+            } else {
+              $('#userNameInput').addClass('hidden');
+              $('#memorableInput').removeClass('hidden');
+              $('#memorableInstructions').text('Enter the ' + (data.digits[0] + 1) + ', ' + (data.digits[1] + 1) + ' and ' + (data.digits[2] + 1) + ' characters of your memorable word.');
+              $('#memOne').focus();
+              $('#newUser').addClass('hidden');
+              $('#resetPassword').removeClass('hidden');
+            }
+          });
+        } else {
+          // Error for not entering the username
+          $('#errorText').text('Enter a user name.');
+          $('#errorText').addClass('alert-danger');
+          $('#username').focus();
+        }
+      } else if (!$('#memorableInput').hasClass("hidden")) {
+        // Memorable word characters Input
+        if ($('#memOne').val() && $('#memTwo').val() && $('#memThr').val()){
+          var formData = $('#frmUserLogin').serializeArray();
+          $('#errorText').text('');
+          $('#errorText').removeClass('alert-danger');
+
+          $.post('{% url 'user_login_check' %}', { csrfmiddlewaretoken: csrftoken, memone: $('#memOne').val(), memtwo: $('#memTwo').val(), memthr: $('#memThr').val() }, function(data, status){
+            if (data.correct == false) {
+              // Crear boxes and set three new
+              $('#memOne').val('');
+              $('#memTwo').val('');
+              $('#memThr').val('');
+              $('#errorText').text('Incorrect characters.');
+              $('#errorText').addClass('alert-danger');
+              $('#memorableInstructions').text('Enter the ' + (data.digits[0] + 1) + ', ' + (data.digits[1] + 1) + ' and '  + (data.digits[2] + 1) + ' characters of your memorable word.');
+              $('#memOne').focus();
+            } else {
+              $('#memorableInput').addClass('hidden');
+              $('#passwordInput').removeClass('hidden');
+              $('#password').focus();
+            }
+          });
+
+        } else {
+          // Error for not entering three characters
+          $('#errorText').text('Enter the three characters.');
+          $('#errorText').addClass('alert-danger');
+          $('#memOne').focus();
+        }
+      } else if (!$('#passwordInput').hasClass("hidden")) {
+        // Password input
+        if ($('#password').val()){
+          $('#errorText').text('');
+          $('#errorText').removeClass('alert-danger');
+          $.post('{% url 'user_login_check' %}', { csrfmiddlewaretoken: csrftoken, password: $('#password').val() }, function(data, status){
+            if (data.correct == false) {
+              $('#password').val('');
+              $('#errorText').text('Incorrect password.');
+              $('#errorText').addClass('alert-danger');
+              $('#password').focus();
+            } else {
+              // Logged in, Redirect to home page
+              window.location.replace("{% url 'home' %}");
+            }
+          });
+        } else {
+          // Error not entering password
+          $('#errorText').text('Enter your password.');
+          $('#errorText').addClass('alert-danger');
+          $('#password').focus();
+        }
       }
     });
 
@@ -83,13 +155,21 @@
 
     // Only allow one char in text box and select after keypress
     $('.onecharonly').bind('keydown', function(event) {
-      if (event.key.length === 1) {
-        event.preventDefault();
-        $(this).val(event.key);
-      }
-      $(this).select();
-    });
+      event.preventDefault();
 
+      var regex = /^\S$/;
+      if (regex.test(event.key)==true) {
+        $(this).val(event.key);
+
+        if ($(this).attr('id') == 'memOne'){
+          $('#memTwo').select();
+        } else if ($(this).attr('id') == 'memTwo'){
+          $('#memThr').select();
+        } else if ($(this).attr('id') == 'memThr'){
+          $('#btnContinue').focus();
+        }
+      }
+    });
   });
 </script>
 {% endblock %}

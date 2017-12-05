@@ -1,3 +1,8 @@
+.onecharonly {
+  padding: 6px;
+  text-align: center;
+}
+
 .vertical-center {
     min-height: 100%;
     min-height: 100vh;
