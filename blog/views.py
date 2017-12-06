@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
-from django.contrib.auth.models import User
+from validate_email import validate_email
 
 from .models import Blogs, Profile
 
@@ -35,7 +36,7 @@ def newUser(request, step=0):
     # New user
     # https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html
     # https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html#sign-up-with-confirmation-mail
-    return render(request, 'home.html', {})
+    return render(request, 'signup.html', {})
 
 def confirmUser(request, hashCode):
     # Confirm User Email
@@ -55,8 +56,32 @@ def postsUser(request):
 
 def loginUser(request):
     # Login User
-
     return render(request, 'login.html', {})
+
+@csrf_protect
+def signupUserCheck(request):
+    # Get variables from post
+    user_name = request.POST.get('username', '')
+    email = request.POST.get('email', '')
+
+    # Check username is not in use, case insensitive
+    if user_name != '':
+        data = {
+            'exists': False,
+        }
+
+        if User.objects.filter(username__iexact=user_name).exists():
+            data['exists'] = True
+
+    # Check email is valid
+    if email != '':
+        data = {
+            'correct': False,
+        }
+        if validate_email(email):
+            data['correct'] = True
+
+    return JsonResponse(data)
 
 
 @csrf_protect

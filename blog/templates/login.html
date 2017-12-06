@@ -1,6 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+          <div class="row">
+            <div class="col-md-6 form-box">
+              <form role="form" class="registration-form" action="javascript:void(0);">
+                {% csrf_token %}
+                  <fieldset>
+                      <div class="form-top">
+                          <div class="form-top-left">
+                              <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span>Sign In</h3>
+                              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+                          </div>
+                      </div>
+                      <div class="form-bottom">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                              <span class="input-group-addon transparent"><span class="glyphicon glyphicon-user"></span></span>
+                              <input id="username" class="form-control left-border-none" placeholder="User Name" type="text" name="username" autocomplete="off">
+                            </div>
+                        </div>
+                          <button type="button" class="btn btn-next">Next</button>
+                      </div>
+                  </fieldset>
+                </form>
+              </div>
+            </div>
+
 <div class="row vertical-center">
   <div class="col-sm-6 col-sm-offset-3">
     <div class="panel panel-success">
@@ -157,7 +182,7 @@
     $('.onecharonly').bind('keydown', function(event) {
       event.preventDefault();
 
-      var regex = /^\S$/;
+      var regex = /^\S$/; // Single non space character
       if (regex.test(event.key)==true) {
         $(this).val(event.key);
 

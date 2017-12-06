@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^post/(?P<pk>[0-9]+)/delete/$', views.deletePost, name='delete_post'),
 
     url(r'^user(?:/(?P<step>[0-9]))?/$', views.newUser, name='user_new'),
+    url(r'^user/usercheck/$', views.signupUserCheck, name='user_signup_check'),
     url(r'^user/(?P<userName>\w+)/$', views.viewUser, name='user_view'),
     url(r'^user/(?P<userName>\w+)/posts/$', views.postsUser, name='user_posts'),
     url(r'^user/(?P<userName>\w+)/edit/$', views.editUser, name='user_edit'),
