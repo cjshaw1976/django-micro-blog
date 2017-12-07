@@ -8,8 +8,8 @@
                     <fieldset>
                         <div class="form-top">
                             <div class="form-top-left">
-                                <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span>Sign Up</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+                                <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span> Sign Up</h3>
+                                <p>Step 1. All field are required.</p>
                             </div>
                         </div>
                         <div class="form-bottom">
@@ -35,8 +35,8 @@
                     <fieldset>
                         <div class="form-top">
                             <div class="form-top-left">
-                                <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span>Sign Up</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+                                <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span> Sign Up</h3>
+                                <p>Step 2. All fields are required.</p>
                             </div>
                         </div>
                         <div class="form-bottom">
@@ -52,7 +52,7 @@
                           </div>
                             <div class="row">
                               <div class="form-group col-sm-12">
-                                  <input type="text" class="form-control" placeholder="Memorable Word" id="fname" autocomplete="off">
+                                  <input type="text" class="form-control" placeholder="Memorable Word" id="memword" autocomplete="off">
                               </div>
                             </div>
                             <button type="button" class="btn btn-previous">Previous</button>
@@ -62,8 +62,8 @@
                     <fieldset>
                         <div class="form-top">
                             <div class="form-top-left">
-                                <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span> Lorem ipsum dolor sit amet</h3>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+                                <h3><span><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span> Sign Up</h3>
+                                <p>Step 3. All fields are required.</p>
                             </div>
                         </div>
                         <div class="form-bottom">
@@ -88,21 +88,20 @@
         document.addEventListener("DOMContentLoaded", function(event) {
           var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-          /* Todo
-           * check password meets requirements
-          */
-          $('#username').bind('keyup', function(event) {
-            // Remove spaces
-            $(this).val(function(i, v) {return v.replace(/\s/g,'');});
+          // Display the first tab
+          $('.registration-form fieldset:first').fadeIn('slow');
 
+          $('#username, #memword').bind('keyup', function(event) {
+            // Remove spaces as type
+            $(this).val(function(i, v) {return v.replace(/\s/g,'');});
+          });
+
+          $('#username').focusout(function(event) {
             // Check if username in use
-            // Not strictly cleaver as you can fish for user names
             $.post('{% url 'user_signup_check' %}', { csrfmiddlewaretoken: csrftoken, username: $('#username').val() }, function(data, status){
               if (data.exists == true) {
-                $('#username').removeClass('input-success');
                 $('#username').addClass('input-error');
               } else {
-                $('#username').removeClass('input-error');
                 $('#username').addClass('input-success');
               }
             });
@@ -113,24 +112,39 @@
             $.post('{% url 'user_signup_check' %}', { csrfmiddlewaretoken: csrftoken, email: $('#email').val() }, function(data, status){
               if (data.correct == true) {
                 $('#email').addClass('input-success');
-                $('#email').removeClass('input-error');
               } else {
                 $('#email').addClass('input-error');
-                $('#email').removeClass('input-success');
               }
             });
           });
 
           // Check passwords meet requirements and match
           $("#password").focusout(function(){
-              $("#password").addClass('input-error');
+            $.post('{% url 'user_signup_check' %}', { csrfmiddlewaretoken: csrftoken, password: $('#password').val() }, function(data, status){
+              if (data.correct == true) {
+                $('#password').addClass('input-success');
+              } else {
+                $('#password').addClass('input-error');
+              }
+              checkPasswordMatch();
+            });
           });
 
-            $('.registration-form fieldset:first').fadeIn('slow');
+          $("#cpassword").focusout(function(){
+            checkPasswordMatch();
+          });
 
-            $('.registration-form input[type="text"]').on('focus', function () {
-                $(this).removeClass('input-error');
-            });
+          function checkPasswordMatch(){
+            if ($('#password').val() == $('#cpassword').val() && $('#password').val().length > 0){
+              $('#cpassword').addClass('input-success');
+            } else {
+              $('#cpassword').addClass('input-error');
+            }
+          }
+
+          $('.registration-form input').on('focus', function () {
+              $(this).removeClass('input-error input-success');
+          });
 
             // next step
             /* Todo, add email check and password checks */
@@ -138,12 +152,12 @@
                 var parent_fieldset = $(this).parents('fieldset');
                 var next_step = true;
 
-                parent_fieldset.find('input[type="text"],input[type="email"]').each(function () {
-                    if ($(this).val() == "") {
+                parent_fieldset.find('input[type="text"],input[type="email"],input[type="password"]').each(function () {
+                    if ($(this).hasClass('input-error')){
+                        next_step = false;
+                    } else if ($(this).val() == "") {
                         $(this).addClass('input-error');
                         next_step = false;
-                    } else {
-                        $(this).removeClass('input-error');
                     }
                 });
 

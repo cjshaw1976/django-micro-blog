@@ -9,6 +9,7 @@ from validate_email import validate_email
 from .models import Blogs, Profile
 
 import random
+import re
 
 
 def home(request):
@@ -58,28 +59,51 @@ def loginUser(request):
     # Login User
     return render(request, 'login.html', {})
 
+
 @csrf_protect
 def signupUserCheck(request):
     # Get variables from post
     user_name = request.POST.get('username', '')
     email = request.POST.get('email', '')
+    password = request.POST.get('password', '')
+
+    data = {}
 
     # Check username is not in use, case insensitive
     if user_name != '':
-        data = {
-            'exists': False,
-        }
+        data['exists'] = False
 
         if User.objects.filter(username__iexact=user_name).exists():
             data['exists'] = True
 
     # Check email is valid
     if email != '':
-        data = {
-            'correct': False,
-        }
+        data['correct'] = False
         if validate_email(email):
             data['correct'] = True
+
+    # Check password conforms
+    if password != '':
+        data['correct'] = True
+        if (len(password)<6):
+            data['correct'] = False
+            data['length'] = "Length must be at least 6 characters"
+        elif password.isalnum():
+            data['correct'] = False
+            data['characters'] = "Must include non alpha numeric characters"
+        elif not re.search("[a-z]",password):
+            data['correct'] = False
+            data['lower'] = "Must include lower case characters"
+        elif not re.search("[A-Z]",password):
+            data['correct'] = False
+            data['upper'] = "Must include uppercase characters"
+        elif not re.search("[0-9]",password):
+            data['correct'] = False
+            data['upper'] = "Must include numeric characters"
+        elif re.search("\s",password):
+            data['correct'] = False
+            data['spaces'] = "Must not include spaces"
+        # Todo, check the first, last and user names are not incorporated in the password
 
     return JsonResponse(data)
 
