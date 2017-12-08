@@ -87,22 +87,22 @@ def signupUserCheck(request):
         data['correct'] = True
         if (len(password)<6):
             data['correct'] = False
-            data['length'] = "Length must be at least 6 characters"
+            data['error'] = "Length must be at least 6 characters"
         elif password.isalnum():
             data['correct'] = False
-            data['characters'] = "Must include non alpha numeric characters"
+            data['error'] = "Must include non alpha numeric characters"
         elif not re.search("[a-z]",password):
             data['correct'] = False
-            data['lower'] = "Must include lower case characters"
+            data['error'] = "Must include lower case characters"
         elif not re.search("[A-Z]",password):
             data['correct'] = False
-            data['upper'] = "Must include uppercase characters"
+            data['error'] = "Must include uppercase characters"
         elif not re.search("[0-9]",password):
             data['correct'] = False
-            data['upper'] = "Must include numeric characters"
+            data['error'] = "Must include numeric characters"
         elif re.search("\s",password):
             data['correct'] = False
-            data['spaces'] = "Must not include spaces"
+            data['error'] = "Must not include spaces"
         # Todo, check the first, last and user names are not incorporated in the password
 
     return JsonResponse(data)

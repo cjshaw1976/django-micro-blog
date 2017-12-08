@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row">
             <div class="col-md-6 form-box">
-                <form role="form" class="registration-form" action="javascript:void(0);">
+                <form role="form" class="registration-form" action="{% url 'user_new' %}" method="post">
                   {% csrf_token %}
                     <fieldset>
                         <div class="form-top">
@@ -15,21 +15,23 @@
                         <div class="form-bottom">
                           <div class="row">
                               <div class="form-group col-sm-12">
-                                  <input type="text" class="form-control" placeholder="User Name" id="username" autocomplete="off">
+                                  <input type="text" name="username" class="form-control" placeholder="User Name" id="username" data-toggle="tooltip" title="The username may contain numbers, letters and special characters, but not spaces." autocomplete="off" required>
                               </div>
                           </div>
-                            <div class="row">
-                                <div class="form-group col-sm-6">
-                                    <input type="text" class="form-control" placeholder="First Name" id="fname" autocomplete="off">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <input type="text" class="form-control" placeholder="Last Name" id="lname" autocomplete="off">
-                                </div>
+                          <div class="row">
+                              <div class="form-group col-sm-6">
+                                  <input type="text" name="firstname" class="form-control" placeholder="First Name" id="firstname" autocomplete="off" required>
+                              </div>
+                              <div class="form-group col-sm-6">
+                                  <input type="text" name="lastname" class="form-control" placeholder="Last Name" id="lastname" autocomplete="off" required>
+                              </div>
+                          </div>
+                          <div class="row">
+                            <div class="form-group col-sm-12">
+                                <input type="text" name="email" placeholder="Email" class="form-email form-control" id="email" data-toggle="tooltip" title="" autocomplete="off" required>
                             </div>
-                            <div class="form-group">
-                                <input type="text" name="email" placeholder="Email" class="form-email form-control" id="email" autocomplete="off" required>
-                            </div>
-                            <button type="button" class="btn btn-next">Next</button>
+                          </div>
+                          <button type="button" class="btn btn-next">Next</button>
                         </div>
                     </fieldset>
                     <fieldset>
@@ -42,21 +44,21 @@
                         <div class="form-bottom">
                           <div class="row">
                               <div class="form-group col-sm-12">
-                                  <input type="password" class="form-control" placeholder="Password" id="password" autocomplete="off">
+                                  <input type="password" name="password" class="form-control" placeholder="Password" id="password" data-toggle="tooltip" title="Password must be at least 6 characters long, contain upper and lower case characters, digits and special characters, but no spaces." autocomplete="off" required>
                               </div>
                           </div>
                           <div class="row">
                               <div class="form-group col-sm-12">
-                                  <input type="password" class="form-control" placeholder="Retype Password" id="cpassword" autocomplete="off">
+                                  <input type="password" class="form-control" placeholder="Retype Password" data-toggle="tooltip" title="Retype your password to confirm." id="cpassword" autocomplete="off" required>
                               </div>
                           </div>
-                            <div class="row">
-                              <div class="form-group col-sm-12">
-                                  <input type="text" class="form-control" placeholder="Memorable Word" id="memword" autocomplete="off">
-                              </div>
+                          <div class="row">
+                            <div class="form-group col-sm-12">
+                                <input type="text" name="memword" class="form-control" placeholder="Memorable Word" id="memword" data-toggle="tooltip" title="Enter a memorable word, case sensitive, no spaces." autocomplete="off" required>
                             </div>
-                            <button type="button" class="btn btn-previous">Previous</button>
-                            <button type="button" class="btn btn-next">Next</button>
+                          </div>
+                          <button type="button" class="btn btn-previous">Previous</button>
+                          <button type="button" class="btn btn-next">Next</button>
                         </div>
                     </fieldset>
                     <fieldset>
@@ -68,13 +70,13 @@
                         </div>
                         <div class="form-bottom">
                             <div class="form-group">
-                                <input type="date" class="form-control" id="pref_date" autocomplete="off">
+                                <input name="birthdate" type="date" class="form-control" id="birthdate" autocomplete="off" required>
                             </div>
                             <div class="form-group">
-                                <textarea class="form-control" id="biograpy" placeholder="About Me"></textarea>
+                                <textarea name="bio" class="form-control" id="bio" placeholder="About Me"></textarea>
                             </div>
                             <div class="form-group">
-                                <input type="file" class="form-control" id="avatar">
+                                <input name="avatar" type="file" class="form-control" id="avatar">
                             </div>
                             <button type="button" class="btn btn-previous">Previous</button>
                             <button type="submit" class="btn">Submit</button>
@@ -87,6 +89,9 @@
       <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function(event) {
           var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+          //Initalize Tooltips
+          $('[data-toggle="tooltip"]').tooltip();
 
           // Display the first tab
           $('.registration-form fieldset:first').fadeIn('slow');
@@ -101,8 +106,10 @@
             $.post('{% url 'user_signup_check' %}', { csrfmiddlewaretoken: csrftoken, username: $('#username').val() }, function(data, status){
               if (data.exists == true) {
                 $('#username').addClass('input-error');
+                $('#username').attr('data-original-title', 'The user name you have entered is close to an existing user name.');
               } else {
                 $('#username').addClass('input-success');
+                $('#username').attr('data-original-title', '');
               }
             });
           });
@@ -112,8 +119,10 @@
             $.post('{% url 'user_signup_check' %}', { csrfmiddlewaretoken: csrftoken, email: $('#email').val() }, function(data, status){
               if (data.correct == true) {
                 $('#email').addClass('input-success');
+                $('#email').attr('data-original-title', '');
               } else {
                 $('#email').addClass('input-error');
+                $('#email').attr('data-original-title', 'Please enter a valid email.');
               }
             });
           });
@@ -123,8 +132,10 @@
             $.post('{% url 'user_signup_check' %}', { csrfmiddlewaretoken: csrftoken, password: $('#password').val() }, function(data, status){
               if (data.correct == true) {
                 $('#password').addClass('input-success');
+                $('#password').attr('data-original-title', '');
               } else {
                 $('#password').addClass('input-error');
+                $('#password').attr('data-original-title', 'Invalid password. ' + data.error)
               }
               checkPasswordMatch();
             });
@@ -134,11 +145,23 @@
             checkPasswordMatch();
           });
 
+          $('#memword').focusout(function(){
+            if ($('#memword').val().length < 6) {
+              $('#memword').addClass('input-error');
+              $('#memword').attr('data-original-title', 'Must  be at least 6 characters.');
+            } else {
+              $('#memword').addClass('input-success');
+              $('#memword').attr('data-original-title', '');
+            }
+          });
+
           function checkPasswordMatch(){
             if ($('#password').val() == $('#cpassword').val() && $('#password').val().length > 0){
               $('#cpassword').addClass('input-success');
+              $('#cpassword').attr('data-original-title', '');
             } else {
               $('#cpassword').addClass('input-error');
+              $('#cpassword').attr('data-original-title', 'Must match the password above exactly.');
             }
           }
 
@@ -146,49 +169,55 @@
               $(this).removeClass('input-error input-success');
           });
 
-            // next step
-            /* Todo, add email check and password checks */
-            $('.registration-form .btn-next').on('click', function () {
-                var parent_fieldset = $(this).parents('fieldset');
-                var next_step = true;
+          // next step
+          $('.registration-form .btn-next').on('click', function () {
+              var parent_fieldset = $(this).parents('fieldset');
+              var next_step = true;
 
-                parent_fieldset.find('input[type="text"],input[type="email"],input[type="password"]').each(function () {
-                    if ($(this).hasClass('input-error')){
-                        next_step = false;
-                    } else if ($(this).val() == "") {
-                        $(this).addClass('input-error');
-                        next_step = false;
-                    }
-                });
+              parent_fieldset.find('input[type="text"],input[type="email"],input[type="password"]').each(function () {
+                  if ($(this).hasClass('input-error')){
+                      next_step = false;
+                  } else if ($(this).val() == "") {
+                      $(this).addClass('input-error');
+                      next_step = false;
+                  }
+              });
 
-                if (next_step) {
-                    parent_fieldset.fadeOut(400, function () {
-                        $(this).next().fadeIn();
-                    });
-                }
+              if (next_step) {
+                  parent_fieldset.fadeOut(400, function () {
+                      $(this).next().fadeIn();
+                  });
+              }
 
-            });
+          });
 
-            // previous step
-            $('.registration-form .btn-previous').on('click', function () {
-                $(this).parents('fieldset').fadeOut(400, function () {
-                    $(this).prev().fadeIn();
-                });
-            });
+          // previous step
+          $('.registration-form .btn-previous').on('click', function () {
+              $(this).parents('fieldset').fadeOut(400, function () {
+                  $(this).prev().fadeIn();
+              });
+          });
 
-            // submit
-            $('.registration-form').on('submit', function (e) {
+          // submit
+          $('.registration-form').on('submit', function (e) {
+              var next_step = true;
 
-                $(this).find('input[type="text"],input[type="email"]').each(function () {
-                    if ($(this).val() == "") {
-                        e.preventDefault();
-                        $(this).addClass('input-error');
-                    } else {
-                        $(this).removeClass('input-error');
-                    }
-                });
+              $(this).find('input[type="text"],input[type="email"],input[type="password"]').each(function () {
+                  if ($(this).hasClass('input-error')){
+                      next_step = false;
+                      console.log($(this));
+                  } else if ($(this).val() == "") {
+                      $(this).addClass('input-error');
+                      next_step = false;
+                      console.log($(this));
+                  }
+              });
 
-            });
+              if (!next_step) {
+                  // Dont submit
+                  e.preventDefault();
+              }
+          });
 
         });
       </script>
